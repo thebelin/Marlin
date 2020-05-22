@@ -737,17 +737,17 @@ void MarlinUI::draw_status_screen() {
   //
 
   #define EXTRAS_2_BASELINE (EXTRAS_BASELINE + 3)
-  
-  if !defined(LCD_LEFT_MARGIN)
-    #define LCD_LEFT_MARGIN 0
+  uint LEFT_MARGIN = 0;
+  #ifdef LCD_LEFT_MARGIN
+    LEFT_MARGIN = LCD_LEFT_MARGIN;
   #endif
   
   if (PAGE_CONTAINS(EXTRAS_2_BASELINE - INFO_FONT_ASCENT, EXTRAS_2_BASELINE - 1)) {
     set_font(FONT_MENU);
-    lcd_put_wchar(LCD_LEFT_MARGIN + 3, EXTRAS_2_BASELINE, LCD_STR_FEEDRATE[0]);
+    lcd_put_wchar(LEFT_MARGIN + 3, EXTRAS_2_BASELINE, LCD_STR_FEEDRATE[0]);
 
     set_font(FONT_STATUSMENU);
-    lcd_put_u8str(LCD_LEFT_MARGIN + 12, EXTRAS_2_BASELINE, i16tostr3rj(feedrate_percentage));
+    lcd_put_u8str(LEFT_MARGIN + 12, EXTRAS_2_BASELINE, i16tostr3rj(feedrate_percentage));
     lcd_put_wchar('%');
 
     //
@@ -767,7 +767,7 @@ void MarlinUI::draw_status_screen() {
   // Status line
   //
   if (PAGE_CONTAINS(STATUS_BASELINE - INFO_FONT_ASCENT, STATUS_BASELINE + INFO_FONT_DESCENT)) {
-    lcd_moveto(LCD_LEFT_MARGIN, STATUS_BASELINE);
+    lcd_moveto(LEFT_MARGIN, STATUS_BASELINE);
 
     #if BOTH(FILAMENT_LCD_DISPLAY, SDSUPPORT)
       // Alternate Status message and Filament display
