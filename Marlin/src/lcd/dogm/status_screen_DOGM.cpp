@@ -356,7 +356,10 @@ void MarlinUI::draw_status_screen() {
     #endif
   #endif
 
-  const bool showxy = TERN1(LCD_SHOW_E_TOTAL, !printingIsActive());
+  bool showxy = TERN1(LCD_SHOW_E_TOTAL, !printingIsActive());
+  #if ENABLED(HIDE_STATUS_XY_DISPLAY)
+    showxy = false;
+  #endif
 
   // At the first page, generate new display values
   if (first_page) {
@@ -664,81 +667,87 @@ void MarlinUI::draw_status_screen() {
   //
   // XYZ Coordinates
   //
-
-  #if ENABLED(XYZ_HOLLOW_FRAME)
-    #define XYZ_FRAME_TOP 29
-    #define XYZ_FRAME_HEIGHT INFO_FONT_ASCENT + 3
-  #else
-    #define XYZ_FRAME_TOP 30
-    #define XYZ_FRAME_HEIGHT INFO_FONT_ASCENT + 1
-  #endif
-
-  if (PAGE_CONTAINS(XYZ_FRAME_TOP, XYZ_FRAME_TOP + XYZ_FRAME_HEIGHT - 1)) {
+  #if DISABLED(STATUS_HIDE_XYZ)
 
     #if ENABLED(XYZ_HOLLOW_FRAME)
-      u8g.drawFrame(0, XYZ_FRAME_TOP, LCD_PIXEL_WIDTH, XYZ_FRAME_HEIGHT); // 8: 29-40  7: 29-39
+      #define XYZ_FRAME_TOP 29
+      #define XYZ_FRAME_HEIGHT INFO_FONT_ASCENT + 3
     #else
-      u8g.drawBox(0, XYZ_FRAME_TOP, LCD_PIXEL_WIDTH, XYZ_FRAME_HEIGHT);   // 8: 30-39  7: 30-37
+      #define XYZ_FRAME_TOP 30
+      #define XYZ_FRAME_HEIGHT INFO_FONT_ASCENT + 1
     #endif
 
-    if (PAGE_CONTAINS(XYZ_BASELINE - (INFO_FONT_ASCENT - 1), XYZ_BASELINE)) {
+    if (PAGE_CONTAINS(XYZ_FRAME_TOP, XYZ_FRAME_TOP + XYZ_FRAME_HEIGHT - 1)) {
 
-      #if DISABLED(XYZ_HOLLOW_FRAME)
-        u8g.setColorIndex(0); // white on black
-      #endif
-
-      #if HAS_DUAL_MIXING
-
-        // Two-component mix / gradient instead of XY
-
-        char mixer_messages[12];
-        const char *mix_label;
-        #if ENABLED(GRADIENT_MIX)
-          if (mixer.gradient.enabled) {
-            mixer.update_mix_from_gradient();
-            mix_label = "Gr";
-          }
-          else
-        #endif
-          {
-            mixer.update_mix_from_vtool();
-            mix_label = "Mx";
-          }
-        sprintf_P(mixer_messages, PSTR("%s %d;%d%% "), mix_label, int(mixer.mix[0]), int(mixer.mix[1]));
-        lcd_put_u8str(X_LABEL_POS, XYZ_BASELINE, mixer_messages);
-
+      #if ENABLED(XYZ_HOLLOW_FRAME)
+        u8g.drawFrame(0, XYZ_FRAME_TOP, LCD_PIXEL_WIDTH, XYZ_FRAME_HEIGHT); // 8: 29-40  7: 29-39
       #else
-
-        if (showxy) {
-          _draw_axis_value(X_AXIS, xstring, blink);
-          _draw_axis_value(Y_AXIS, ystring, blink);
-        }
-        else {
-          _draw_axis_value(E_AXIS, xstring, true);
-          lcd_put_u8str_P(PSTR("       "));
-        }
-
+        u8g.drawBox(0, XYZ_FRAME_TOP, LCD_PIXEL_WIDTH, XYZ_FRAME_HEIGHT);   // 8: 30-39  7: 30-37
       #endif
 
-      _draw_axis_value(Z_AXIS, zstring, blink);
+      if (PAGE_CONTAINS(XYZ_BASELINE - (INFO_FONT_ASCENT - 1), XYZ_BASELINE)) {
 
-      #if DISABLED(XYZ_HOLLOW_FRAME)
-        u8g.setColorIndex(1); // black on white
-      #endif
+        #if DISABLED(XYZ_HOLLOW_FRAME)
+          u8g.setColorIndex(0); // white on black
+        #endif
+
+        #if HAS_DUAL_MIXING
+
+          // Two-component mix / gradient instead of XY
+
+          char mixer_messages[12];
+          const char *mix_label;
+          #if ENABLED(GRADIENT_MIX)
+            if (mixer.gradient.enabled) {
+              mixer.update_mix_from_gradient();
+              mix_label = "Gr";
+            }
+            else
+          #endif
+            {
+              mixer.update_mix_from_vtool();
+              mix_label = "Mx";
+            }
+          sprintf_P(mixer_messages, PSTR("%s %d;%d%% "), mix_label, int(mixer.mix[0]), int(mixer.mix[1]));
+          lcd_put_u8str(X_LABEL_POS, XYZ_BASELINE, mixer_messages);
+
+        #else
+
+          if (showxy) {
+            _draw_axis_value(X_AXIS, xstring, blink);
+            _draw_axis_value(Y_AXIS, ystring, blink);
+          }
+          else {
+            _draw_axis_value(E_AXIS, xstring, true);
+            lcd_put_u8str_P(PSTR("       "));
+          }
+
+        #endif
+
+        _draw_axis_value(Z_AXIS, zstring, blink);
+
+        #if DISABLED(XYZ_HOLLOW_FRAME)
+          u8g.setColorIndex(1); // black on white
+        #endif
+      }
     }
-  }
-
+  #endif
   //
   // Feedrate
   //
-  #define EXTRAS_2_BASELINE (EXTRAS_BASELINE + 3)
 
+  #define EXTRAS_2_BASELINE (EXTRAS_BASELINE + 3)
+  
+  if !defined(LCD_LEFT_MARGIN)
+    #define LCD_LEFT_MARGIN 0
+  #endif
+  
   if (PAGE_CONTAINS(EXTRAS_2_BASELINE - INFO_FONT_ASCENT, EXTRAS_2_BASELINE - 1)) {
     set_font(FONT_MENU);
-    lcd_put_wchar(3, EXTRAS_2_BASELINE, LCD_STR_FEEDRATE[0]);
+    lcd_put_wchar(LCD_LEFT_MARGIN + 3, EXTRAS_2_BASELINE, LCD_STR_FEEDRATE[0]);
 
     set_font(FONT_STATUSMENU);
-    lcd_put_u8str(12, EXTRAS_2_BASELINE, i16tostr3rj(feedrate_percentage));
+    lcd_put_u8str(LCD_LEFT_MARGIN + 12, EXTRAS_2_BASELINE, i16tostr3rj(feedrate_percentage));
     lcd_put_wchar('%');
 
     //
@@ -758,7 +767,7 @@ void MarlinUI::draw_status_screen() {
   // Status line
   //
   if (PAGE_CONTAINS(STATUS_BASELINE - INFO_FONT_ASCENT, STATUS_BASELINE + INFO_FONT_DESCENT)) {
-    lcd_moveto(0, STATUS_BASELINE);
+    lcd_moveto(LCD_LEFT_MARGIN, STATUS_BASELINE);
 
     #if BOTH(FILAMENT_LCD_DISPLAY, SDSUPPORT)
       // Alternate Status message and Filament display
