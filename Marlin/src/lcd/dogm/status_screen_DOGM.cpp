@@ -737,7 +737,7 @@ void MarlinUI::draw_status_screen() {
   //
 
   #define EXTRAS_2_BASELINE (EXTRAS_BASELINE + 3)
-  uint LEFT_MARGIN = 0;
+  int LEFT_MARGIN = 0;
   #ifdef LCD_LEFT_MARGIN
     LEFT_MARGIN = LCD_LEFT_MARGIN;
   #endif
