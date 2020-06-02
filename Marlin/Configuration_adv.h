@@ -1821,7 +1821,7 @@
  * Note that M207 / M208 / M209 settings are saved to EEPROM.
  *
  */
-//#define FWRETRACT
+#define FWRETRACT
 #if ENABLED(FWRETRACT)
   #define FWRETRACT_AUTORETRACT           // Override slicer retractions
   #if ENABLED(FWRETRACT_AUTORETRACT)
@@ -2985,6 +2985,10 @@
 
   #define USER_DESC_5 "Home & Info"
   #define USER_GCODE_5 "G28\nM503"
+
+  #define USER_DESC_5 "Clean Nozzle"
+  #define USER_GCODE_5 "M109 S200\n G28\n  G1E-1F2700 \n M211S0\n G0X255F2000\n G0X235\n G0X255\n G0X235\n G0X255\n G0X235\n G0X255\n G0X235\n G0X255\n G0X235\n G0 X0\n M211S1\n G28 X0\n M109 S0"
+
 #endif
 
 /**
