@@ -1,3 +1,12 @@
+# PurplePrinter Config
+This branch tracks changes for the PurplePrinter
+Kirkland Meeseeks Boot
+Meeseeks Theme Status
+SKR 1.3
+Direct Drive Pitan
+24V accessories
+Nozzle
+
 # Marlin 3D Printer Firmware
 
 ![GitHub](https://img.shields.io/github/license/marlinfirmware/marlin.svg)
