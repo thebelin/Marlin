@@ -386,7 +386,7 @@
  * Define one or both of these to override the default 0-255 range.
  */
 #define FAN_MIN_PWM 50
-#define FAN_MAX_PWM 128
+#define FAN_MAX_PWM 255
 
 /**
  * FAST PWM FAN Settings
@@ -1740,7 +1740,7 @@
 
 // The ASCII buffer for serial input
 #define MAX_CMD_SIZE 96
-#define BUFSIZE 4
+#define BUFSIZE 128
 
 // Transmission to Host Buffer Size
 // To save 386 bytes of PROGMEM (and TX_BUFFER_SIZE+3 bytes of RAM) set to 0.
